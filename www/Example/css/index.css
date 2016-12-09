@@ -1,0 +1,40 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+html,body{
+    background: #fff;
+    font-size: 14px;
+}
+.fll{
+    float: left;
+}
+.flr{
+    float:right;
+}
+.clb{
+    clear: both;
+}
+.main{
+    width: 900px;
+    margin: 0 auto;
+}
+.box,
+.box_inner{
+    width: 280px;
+    height: 280px;
+    box-sizing: border-box;
+    border: 1px solid #cccccc;
+    margin: 10px;
+    border-radius: 3px;
+}
+.box_inner{
+    width: 260px;
+    height: 260px;
+}
+.circle{
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background-color: green;
+}
