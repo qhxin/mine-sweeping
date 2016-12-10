@@ -32,4 +32,12 @@ html,body{
     border-radius: 3px;
     box-shadow: 0px 0px 5px #000;
     background-color: #fff;
+    padding: 3px;
 }
+.sl-title{
+    height:30px;
+    line-height:30px;
+}
+
+
+

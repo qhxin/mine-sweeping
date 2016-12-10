@@ -5,7 +5,7 @@
 
         getInitialState: function(){
             return {
-                'level': 3
+                'level': 1
             };
         },
         render: function(){
@@ -24,7 +24,7 @@
 
             return (
                 <div className="sl-main" style={{ 'width': width, 'height': height, 'margin-top': -(height/2),'margin-left':-(width/2) }}>
-                    Hello
+                    <div className="sl-title"></div>
                 </div>
             );
         }
