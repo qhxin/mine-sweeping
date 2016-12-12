@@ -31,13 +31,31 @@ html,body{
     box-sizing: border-box;
     border-radius: 3px;
     box-shadow: 0px 0px 5px #000;
-    background-color: #fff;
-    padding: 3px;
+    background-color: #6099B7;
+    /*padding: 3px;*/
 }
 .sl-title{
-    height:30px;
     line-height:30px;
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    right: 3px;
+    height:30px;
 }
-
+.sl-box{
+    box-sizing: border-box;
+    border: 1px solid #fff;
+    position: absolute;
+    top: 36px;
+    left: 3px;
+    right: 3px;
+    bottom: 3px;
+    border-radius: 2px;
+}
+.sl-lei{
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+}
 
 
