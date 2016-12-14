@@ -57,7 +57,7 @@ html,body{
     width: 20px;
     height: 20px;
     display: inline-block;
-    background: #182B34;
+    background-color: #182B34;
     position: absolute;
     box-sizing: border-box;
     border-radius: 2px;
@@ -66,7 +66,7 @@ html,body{
     line-height: 18px;
 }
 .sl-lei.open{
-    background: #4983A0;
+    background-color: #4983A0;
 }
 .sl-lei.open.blue{
     color: blue;
@@ -79,4 +79,14 @@ html,body{
 }
 .sl-lei.open.yellow{
     color: yellow;
+}
+.sl-lei.flag{
+    background-image: url(../images/flag.png);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.sl-lei.thinking{
+    background-image: url(../images/thinking.png);
+    background-repeat: no-repeat;
+    background-position: center;
 }

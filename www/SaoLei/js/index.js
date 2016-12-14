@@ -9,19 +9,21 @@ $(document).ready(function($){
                 hasLei: (this.props.Lei===true),
                 roundN: this.props.RD,
                 sR: this.props.sR,
-                opened: false
+                opened: false,
+                bg: 1
             }
         },
         componentWillReceiveProps(nextProps){
             if(nextProps.sR != this.props.sR){
                 this.setState({
                     sR: nextProps.sR,
-                    opened: false
+                    opened: false,
+                    bg: 1
                 });
             }
         },
         handlerClickLeft(){
-            if(!this.state.opened){
+            if(!this.state.opened && this.state.bg==1){
                 this.setState({
                     opened: true
                 });
@@ -30,35 +32,60 @@ $(document).ready(function($){
         handlerClickRight(e){
             e.preventDefault();
             e.stopPropagation();
-            console.log(1)
+
+            if(!this.state.opened){
+                var bg = this.state.bg + 1;
+                if(bg>3){
+                    bg=1;
+                }else{
+                    if(bg==2){
+                        this.props.handlerImLei();
+                    }else
+                    if(bg==3){
+                        this.props.handlerImNotLei();
+                    }
+                }
+                this.setState({
+                    bg: bg
+                });
+            }
         },
         render(){
             let show_num = '',
                 classes = 'sl-lei';
-            if(this.state.opened){
-                classes += ' open';
-                if(this.state.hasLei){
-                    show_num = 'X';
-                }else{
-                    show_num = this.state.roundN;
-                    if(show_num>0 && show_num<=2){
-                        classes += ' blue';
-                    }else
-                    if(show_num>2 && show_num<=4){
-                        classes += ' orange';
-                    }else
-                    if(show_num>4 && show_num<=6){
-                        classes += ' red';
-                    }else
-                    if(show_num>6 && show_num<=8){
-                        classes += ' yellow';
-                    }else
-                    if(show_num==0){
-                        show_num = '';
+
+            if(this.state.bg==2){
+                classes += ' flag';
+            }else
+            if(this.state.bg==3){
+                classes += ' thinking';
+            }else{
+                if(this.state.opened){
+                    classes += ' open';
+                    if(this.state.hasLei){
+                        show_num = 'X';
+                    }else{
+                        show_num = this.state.roundN;
+                        if(show_num>0 && show_num<=2){
+                            classes += ' blue';
+                        }else
+                        if(show_num>2 && show_num<=4){
+                            classes += ' orange';
+                        }else
+                        if(show_num>4 && show_num<=6){
+                            classes += ' red';
+                        }else
+                        if(show_num>6 && show_num<=8){
+                            classes += ' yellow';
+                        }else
+                        if(show_num==0){
+                            show_num = '';
+                        }
                     }
                 }
             }
 
+            console.log(456)
             return (
                 <div className={classes}
                     style={{ left: this.props.sLeft, top: this.props.sTop}}
@@ -76,8 +103,6 @@ $(document).ready(function($){
                 row = parseInt(h/leiSize, 10),
                 num = col*row,
                 limit = num*props.LPer/100;
-
-            props.handlerSetCount(0, limit);
 
             let leiMap = ((limit, num, col, row)=>{
                 var aLuanXu=[];
@@ -156,7 +181,8 @@ $(document).ready(function($){
                 num: num,
                 col: col,
                 row: row,
-                leiMap: leiMap
+                leiMap: leiMap,
+                LeiCount: limit
             };
         },
         getInitialState(){
@@ -166,8 +192,19 @@ $(document).ready(function($){
 
             return $.extend(state, prl, true);
         },
+        componentDidMount(){
+            this.props.handlerSetAllCount(this.state.LeiCount);
+        },
         componentWillReceiveProps(nextProps){
-            this.setState(this.caculateSth(nextProps));
+            if(nextProps.boxWidth!=this.props.boxWidth || nextProps.boxHeight!=this.props.boxHeight){
+                this.setState(this.caculateSth(nextProps));
+            }
+        },
+        handlerImLei(){
+            this.props.handlerAddCount();
+        },
+        handlerImNotLei(){
+            this.props.handlerSubCount();
         },
         render(){
 
@@ -177,7 +214,7 @@ $(document).ready(function($){
                     let lei_line = this.state.leiMap[i];
                     for(let j in lei_line){
                         if(lei_line.hasOwnProperty(j)){
-                            lei.push(<Lei sR={Math.random()} sX={j} sY={i} Lei={lei_line[j].isLei} RD={lei_line[j].roundNum} sLeft={j*leiSize} sTop={i*leiSize}/>);
+                            lei.push(<Lei sR={Math.random()} sX={j} sY={i} Lei={lei_line[j].isLei} RD={lei_line[j].roundNum} sLeft={j*leiSize} sTop={i*leiSize} handlerImLei={this.handlerImLei} handlerImNotLei={this.handlerImNotLei}/>);
                         }
                     }
                 }
@@ -191,12 +228,39 @@ $(document).ready(function($){
         }
     });
 
+    let CountBanner = React.createClass({
+        getInitialState(){
+            return {
+                all_count: 0,
+                find_count: 0
+            }
+        },
+        handlerAddCount(){
+            this.setState({
+                find_count: this.state.find_count+1
+            })
+        },
+        handlerSubCount(){
+            this.setState({
+                find_count: this.state.find_count-1
+            })
+        },
+        handlerSetAllCount(all){
+            this.setState({
+                all_count: all||0
+            })
+        },
+        render(){
+            return (
+                <span>{this.state.all_count-this.state.find_count}:{this.state.all_count}</span>
+            );
+        }
+    });
+
     let Main = React.createClass({
         getInitialState(){
             return {
-                level: 1,
-                all_count: 0,
-                find_count: 0
+                level: 1
             };
         },
         handlerSelectLevel(e){
@@ -205,15 +269,16 @@ $(document).ready(function($){
                 level: parseInt(e.target.value, 10)
             })
         },
-        handlerSetCount(find, all){
-
-            this.setState({
-                all_count: all||0,
-                find_count: find||0
-            })
+        handlerAddCount(){
+            this.refs.countBanner.handlerAddCount();
+        },
+        handlerSubCount(){
+            this.refs.countBanner.handlerSubCount();
+        },
+        handlerSetAllCount(all){
+            this.refs.countBanner.handlerSetAllCount(all);
         },
         render(){
-
             let level_map = {
                     1: { n:'初级', w:300, h:400, per: 15},    //300   0.15
                     2: { n:'中级', w:500, h:400, per: 30},    //500   0.3
@@ -241,11 +306,11 @@ $(document).ready(function($){
                         <span> | </span>
                         <select className="sl-level-select" defaultValue={this.state.level} onChange={this.handlerSelectLevel}>{levels_select_opt}</select>
                         <span> | </span>
-                        <span>{this.state.find_count}:{this.state.all_count}</span>
+                        <CountBanner ref="countBanner"/>
                         <span> | </span>
                         <span><input type="button" value="重置"/></span>
                     </div>
-                    <Box boxWidth={b_width} boxHeight={b_height} LPer={b_per} handlerSetCount={this.handlerSetCount}/>
+                    <Box boxWidth={b_width} boxHeight={b_height} LPer={b_per} handlerAddCount={this.handlerAddCount} handlerSubCount={this.handlerSubCount} handlerSetAllCount={this.handlerSetAllCount}/>
                 </div>
             );
         }
