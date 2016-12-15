@@ -10,14 +10,27 @@ $(document).ready(function($){
                 roundN: this.props.RD,
                 sR: this.props.sR,
                 opened: false,
+                end: false,
                 bg: 1
             }
         },
         componentWillReceiveProps(nextProps){
             if(nextProps.sR != this.props.sR){
                 this.setState({
+                    hasLei: (nextProps.Lei===true),
+                    roundN: nextProps.RD,
                     sR: nextProps.sR,
                     opened: false,
+                    end: false,
+                    bg: 1
+                });
+            }
+        },
+        handlerShowMe(){
+            if(!this.state.opened && ( !(this.state.hasLei && this.state.bg==2) )){
+                this.setState({
+                    opened: true,
+                    end: true,
                     bg: 1
                 });
             }
@@ -63,7 +76,10 @@ $(document).ready(function($){
                 if(this.state.opened){
                     classes += ' open';
                     if(this.state.hasLei){
-                        show_num = 'X';
+                        show_num = <div className="sl-lei-show"></div>;
+                        if(!this.state.end){
+                            this.props.handlerShowAllLei();
+                        }
                     }else{
                         show_num = this.state.roundN;
                         if(show_num>0 && show_num<=2){
@@ -81,11 +97,14 @@ $(document).ready(function($){
                         if(show_num==0){
                             show_num = '';
                         }
+
+                        if(!this.state.hasLei && this.state.roundN==0){
+                            this.props.caculateRoundOut(this.props.sX, this.props.sY);
+                        }
                     }
                 }
             }
 
-            console.log(456)
             return (
                 <div className={classes}
                     style={{ left: this.props.sLeft, top: this.props.sTop}}
@@ -125,22 +144,22 @@ $(document).ready(function($){
                     if(row_i+1<row){
                         num += map[row_i+1][col_i]?1:0;
                     }
-                    if(row_i+1<row && col_i-1>0){
+                    if(row_i+1<row && col_i-1>=0){
                         num += map[row_i+1][col_i-1]?1:0;
                     }
                     if(col_i+1<col){
                         num += map[row_i][col_i+1]?1:0;
                     }
-                    if(col_i-1>0){
+                    if(col_i-1>=0){
                         num += map[row_i][col_i-1]?1:0;
                     }
-                    if(row_i-1>0 && col_i+1<col){
+                    if(row_i-1>=0 && col_i+1<col){
                         num += map[row_i-1][col_i+1]?1:0;
                     }
-                    if(row_i-1>0){
+                    if(row_i-1>=0){
                         num += map[row_i-1][col_i]?1:0;
                     }
-                    if(row_i-1>0 && col_i-1>0){
+                    if(row_i-1>=0 && col_i-1>=0){
                         num += map[row_i-1][col_i-1]?1:0;
                     }
                     return num;
@@ -185,6 +204,41 @@ $(document).ready(function($){
                 LeiCount: limit
             };
         },
+        caculateRoundOut(col, row){
+            let x = parseInt(row, 10);
+            let y = parseInt(col, 10);
+            let item = this.state.leiMap[x][y],
+                list = [];
+            if(!item.isLei && item.roundNum==0){
+                if(this.state.leiMap[x+1] && this.state.leiMap[x+1][y+1] && !this.state.leiMap[x+1][y+1].isLei){
+                    list.push([x+1, y+1]);
+                }
+                if(this.state.leiMap[x+1] && this.state.leiMap[x+1][y] && !this.state.leiMap[x+1][y].isLei){
+                    list.push([x+1, y]);
+                }
+                if(this.state.leiMap[x+1] && this.state.leiMap[x+1][y-1] && !this.state.leiMap[x+1][y-1].isLei){
+                    list.push([x+1, y-1]);
+                }
+                if(this.state.leiMap[x][y+1] && !this.state.leiMap[x][y+1].isLei){
+                    list.push([x, y+1]);
+                }
+                if(this.state.leiMap[x][y-1] && !this.state.leiMap[x][y-1].isLei){
+                    list.push([x, y-1]);
+                }
+                if(this.state.leiMap[x-1] && this.state.leiMap[x-1][y+1] && !this.state.leiMap[x-1][y+1].isLei){
+                    list.push([x-1, y+1]);
+                }
+                if(this.state.leiMap[x-1] && this.state.leiMap[x-1][y] && !this.state.leiMap[x-1][y].isLei){
+                    list.push([x-1, y]);
+                }
+                if(this.state.leiMap[x-1] && this.state.leiMap[x-1][y-1] && !this.state.leiMap[x-1][y-1].isLei){
+                    list.push([x-1, y-1]);
+                }
+                $.each(list, function(i, o){
+                    this.refs['Lei_'+o[1]+'_'+o[0]].handlerClickLeft();
+                }.bind(this));
+            }
+        },
         getInitialState(){
             let state = {};
 
@@ -193,18 +247,49 @@ $(document).ready(function($){
             return $.extend(state, prl, true);
         },
         componentDidMount(){
-            this.props.handlerSetAllCount(this.state.LeiCount);
+            this.props.handlerSetAllCount(this.state.LeiCount, true);
+        },
+        componentDidUpdate(){
+            this.props.handlerSetAllCount(this.state.LeiCount, true);
         },
         componentWillReceiveProps(nextProps){
             if(nextProps.boxWidth!=this.props.boxWidth || nextProps.boxHeight!=this.props.boxHeight){
-                this.setState(this.caculateSth(nextProps));
+                this.handlerReleaseBox(nextProps);
             }
+        },
+        handlerReleaseBox(props){
+            var prop;
+            if(props){
+                prop = props;
+            }else{
+                prop = this.props;
+            }
+            this.setState(this.caculateSth(prop));
         },
         handlerImLei(){
             this.props.handlerAddCount();
         },
         handlerImNotLei(){
             this.props.handlerSubCount();
+        },
+        handlerShowAll(){
+            let col_i, row_i, arr = [];
+            for(row_i in this.state.leiMap){
+                if(this.state.leiMap.hasOwnProperty(row_i)){
+                    for(col_i in this.state.leiMap[row_i]){
+                        if(this.state.leiMap[row_i].hasOwnProperty(col_i)){
+                            //if(this.state.leiMap[row_i][col_i].isLei){
+                                arr.push([col_i, row_i]);
+                            //}
+                        }
+                    }
+                }
+            }
+            $.each(arr, function(i, o){
+
+                this.refs['Lei_'+o[0]+'_'+o[1]].handlerShowMe();
+            }.bind(this));
+            alert('踩雷啦');
         },
         render(){
 
@@ -214,7 +299,11 @@ $(document).ready(function($){
                     let lei_line = this.state.leiMap[i];
                     for(let j in lei_line){
                         if(lei_line.hasOwnProperty(j)){
-                            lei.push(<Lei sR={Math.random()} sX={j} sY={i} Lei={lei_line[j].isLei} RD={lei_line[j].roundNum} sLeft={j*leiSize} sTop={i*leiSize} handlerImLei={this.handlerImLei} handlerImNotLei={this.handlerImNotLei}/>);
+                            lei.push(<Lei sR={Math.random()} ref={'Lei_'+j+'_'+i} sX={j} sY={i} Lei={lei_line[j].isLei} RD={lei_line[j].roundNum} sLeft={j*leiSize} sTop={i*leiSize}
+                                caculateRoundOut={this.caculateRoundOut}
+                                handlerShowAllLei={this.handlerShowAll}
+                                handlerImLei={this.handlerImLei}
+                                handlerImNotLei={this.handlerImNotLei}/>);
                         }
                     }
                 }
@@ -245,10 +334,17 @@ $(document).ready(function($){
                 find_count: this.state.find_count-1
             })
         },
-        handlerSetAllCount(all){
-            this.setState({
-                all_count: all||0
-            })
+        handlerSetAllCount(all, reset_find){
+            if(reset_find){
+                this.setState({
+                    find_count: 0,
+                    all_count: all||0
+                })
+            }else{
+                this.setState({
+                    all_count: all||0
+                })
+            }
         },
         render(){
             return (
@@ -275,14 +371,17 @@ $(document).ready(function($){
         handlerSubCount(){
             this.refs.countBanner.handlerSubCount();
         },
-        handlerSetAllCount(all){
-            this.refs.countBanner.handlerSetAllCount(all);
+        handlerSetAllCount(all, reset_find){
+            this.refs.countBanner.handlerSetAllCount(all, reset_find);
+        },
+        handlerReleaseBox(){
+            this.refs.mapBox.handlerReleaseBox();
         },
         render(){
             let level_map = {
                     1: { n:'初级', w:300, h:400, per: 15},    //300   0.15
-                    2: { n:'中级', w:500, h:400, per: 30},    //500   0.3
-                    3: { n:'高级', w:600, h:500, per: 60}     //750   0.6
+                    2: { n:'中级', w:500, h:400, per: 20},    //500   0.2
+                    3: { n:'高级', w:600, h:500, per: 22}     //750   0.22
                 };
 
             let b_width = level_map[this.state.level].w,
@@ -308,9 +407,9 @@ $(document).ready(function($){
                         <span> | </span>
                         <CountBanner ref="countBanner"/>
                         <span> | </span>
-                        <span><input type="button" value="重置"/></span>
+                        <span><input type="button" value="重置" onClick={this.handlerReleaseBox}/></span>
                     </div>
-                    <Box boxWidth={b_width} boxHeight={b_height} LPer={b_per} handlerAddCount={this.handlerAddCount} handlerSubCount={this.handlerSubCount} handlerSetAllCount={this.handlerSetAllCount}/>
+                    <Box ref="mapBox" boxWidth={b_width} boxHeight={b_height} LPer={b_per} handlerAddCount={this.handlerAddCount} handlerSubCount={this.handlerSubCount} handlerSetAllCount={this.handlerSetAllCount}/>
                 </div>
             );
         }

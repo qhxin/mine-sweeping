@@ -65,6 +65,9 @@ html,body{
     text-align: center;
     line-height: 18px;
 }
+.sl-lei:hover{
+    opacity: 0.7;
+}
 .sl-lei.open{
     background-color: #4983A0;
 }
@@ -87,6 +90,15 @@ html,body{
 }
 .sl-lei.thinking{
     background-image: url(../images/thinking.png);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.sl-lei>.sl-lei-show{
+    display: inline-block;
+    margin: 2px;
+    width: 15px;
+    height: 15px;
+    background-image: url(../images/lei-show.png);
     background-repeat: no-repeat;
     background-position: center;
 }
