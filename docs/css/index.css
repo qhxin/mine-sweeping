@@ -15,6 +15,26 @@ html,body{
 .clb{
     clear: both;
 }
+.start {
+    display: block;
+    margin-top: 300px;
+}
+.startTitle {
+    text-align: center;
+}
+.startBtn {
+    margin: 20px auto;
+    width: 150px;
+    height: 40px;
+    line-height: 40px;
+    background: #333;
+    color: #fff;
+    text-align: center;
+    cursor: pointer;
+}
+#StartShow {
+    display: none;
+}
 .main{
     position: absolute;
     left:0;

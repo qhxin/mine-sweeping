@@ -4,16 +4,60 @@
     <meta charset="utf-8"/>
     <title>扫雷</title>
     <link rel="stylesheet" type="text/css" href="./css/index.css"/>
+    <script src="./APPLib/nebPay.js"></script>
+    <script src="./APPLib/nebulas.js"></script>
+    <script>
+        window.NebPay = require('nebpay');
+    </script>
 </head>
 
 <body>
 
-<div class="main" id="Main"></div>
+<div class="start" id="Start">
+    <h1 class="startTitle">复古扫雷</h1>
+    <div class="startBtn" id="StartButton">开始</div>
+</div>
+<div id="StartShow">
+    <div class="main" id="Main"></div>
+</div>
 
 <script src="./APPLib/react.min.js"></script>
 <script src="./APPLib/react-dom.min.js"></script>
 <script src="./APPLib/browser.min.js"></script>
 <script src="./APPLib/jquery-1.8.2.min.js"></script>
+
+<script>
+    var nebPay = new NebPay();
+    var dappAddress = 'n1yaH69CfrQRMrXYvJ5U4ZE8DmS9kPLNDVZ';
+    //var hash = '557ce9d65129d701b1a9d82503dd575d02d69885008fe6e169eeb0b1e3b4f29b';
+    function linkNas(key, item) {
+        return new Promise((resolve, reject) => {
+            nebPay.call(dappAddress, '0', 'add', JSON.stringify([key, item]), {
+                listener(res) {
+                    if (typeof res === 'string') {
+                        reject(new Error(res));
+                        return;
+                    }
+                    resolve(res.txhash);
+                },
+            });
+        });
+    }
+    $(document).ready(function() {
+        var $StartButton = $('#StartButton');
+        $StartButton.click(function(){
+            $StartButton.text('正在链接星云链...');
+            linkNas('startStamp', Date.now())
+            .then(function(){
+                $StartButton.hide();
+                $('#StartShow').show();
+            })
+            .catch(function(){
+                $StartButton.text('开始');
+            });
+        });
+    });
+</script>
 <script type="text/babel" src="./js/index.js"></script>
 
 </body>
